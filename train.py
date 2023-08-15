@@ -22,10 +22,11 @@ from torch.optim.lr_scheduler import MultiStepLR
 import utils.config as config
 import wandb
 from utils.dataset import RefDataset
+from utils.dataset_ldm import RefDataset as RefDataset_ldm
 from engine.engine import train, validate
 from model import build_segmenter
 from utils.misc import (init_random_seed, set_random_seed, setup_logger,
-                        worker_init_fn, build_scheduler, collate_fn)
+                        worker_init_fn, build_scheduler) #, collate_fn)
 
 warnings.filterwarnings("ignore")
 cv2.setNumThreads(0)
@@ -51,7 +52,7 @@ def get_parser():
     return cfg
 
 
-@logger.catch #在子线程或主线程中捕获异常
+@logger.catch #find exceptions in parent or child processes
 def main():
     args = get_parser()
     args.manual_seed = init_random_seed(args.manual_seed)
@@ -83,7 +84,7 @@ def main_worker(gpu, args):
     # wandb
     if args.rank == 0:
         wandb.init(job_type="training",
-                   mode="offline",
+                   mode="online",
                    config=args,
                    project=args.exp_name,
                    name=args.exp_name,
@@ -108,23 +109,40 @@ def main_worker(gpu, args):
     args.batch_size_val = int(args.batch_size_val / args.ngpus_per_node)
     args.workers = int(
         (args.workers + args.ngpus_per_node - 1) / args.ngpus_per_node)
-    train_data = RefDataset(lmdb_dir=args.train_lmdb,
+    if args.backbone == 'swin':
+        train_data = RefDataset(lmdb_dir=args.train_lmdb,
+                                mask_dir=args.mask_root,
+                                dataset=args.dataset,
+                                split=args.train_split,
+                                mode='train',
+                                input_size=args.input_size,
+                                word_length=args.word_len
+                                )
+        val_data = RefDataset(lmdb_dir=args.val_lmdb,
                             mask_dir=args.mask_root,
                             dataset=args.dataset,
-                            split=args.train_split,
-                            mode='train',
+                            split=args.val_split,
+                            mode='val',
                             input_size=args.input_size,
-                            word_length=args.word_len
+                            word_length=args.word_len,
                             )
-    val_data = RefDataset(lmdb_dir=args.val_lmdb,
-                          mask_dir=args.mask_root,
-                          dataset=args.dataset,
-                          split=args.val_split,
-                          mode='val',
-                          input_size=args.input_size,
-                          word_length=args.word_len,
-                          )
-
+    else:
+        train_data = RefDataset_ldm(lmdb_dir=args.train_lmdb,
+                        mask_dir=args.mask_root,
+                        dataset=args.dataset,
+                        split=args.train_split,
+                        mode='train',
+                        input_size=args.input_size,
+                        word_length=args.word_len
+                        )
+        val_data = RefDataset_ldm(lmdb_dir=args.val_lmdb,
+                            mask_dir=args.mask_root,
+                            dataset=args.dataset,
+                            split=args.val_split,
+                            mode='val',
+                            input_size=args.input_size,
+                            word_length=args.word_len,
+                            )
     # build dataloader
     init_fn = partial(worker_init_fn,
                       num_workers=args.workers,
@@ -141,7 +159,7 @@ def main_worker(gpu, args):
                                    pin_memory=True,
                                    worker_init_fn=init_fn,
                                    sampler=train_sampler,
-                                   collate_fn=collate_fn,
+                                #    collate_fn=collate_fn,
                                    drop_last=True)
     val_loader = data.DataLoader(val_data,
                                  batch_size=args.batch_size_val,
@@ -150,7 +168,7 @@ def main_worker(gpu, args):
                                  pin_memory=True,
                                  sampler=val_sampler,
                                  drop_last=False,
-                                 collate_fn=collate_fn,
+                                #  collate_fn=collate_fn,
                                  )
 
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda x: (1 - x / (len(train_loader) * args.epochs)) ** 0.9)

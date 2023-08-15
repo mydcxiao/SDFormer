@@ -50,23 +50,51 @@ def sigmoid_focal_loss(inputs, targets, alpha: float = 0.25, gamma: float = 2):
         loss = alpha_t * loss
     return loss.mean()
 
+def build_attention_mask(context_length):
+    # lazily create causal attention mask, with full attention between the vision tokens
+    # pytorch uses additive attention mask; fill with -inf
+    mask = torch.empty(context_length, context_length)
+    mask.fill_(float("-inf"))
+    mask.triu_(1)  # zero out the lower diagonal
+    return mask
 
 class CGFormer(nn.Module):
     def __init__(self, backbone, args):
         super(CGFormer, self).__init__()
         self.backbone = backbone
         self.decoder = Decoder(args)
-        self.text_encoder = BertModel.from_pretrained(args.bert)
-        self.text_encoder.pooler = None
+        if args.backbone == 'swin':
+            self.text_encoder = BertModel.from_pretrained(args.bert)
+            self.text_encoder.pooler = None
+        else:
+            self.text_encoder = self.backbone.feature_extractor.clip.clip
+        self.backbone_type = args.backbone
 
     def forward(self, x, text, l_mask, mask=None):
         input_shape = x.shape[-2:]
-        l_feats = self.text_encoder(text, attention_mask=l_mask)[0]  # (6, 10, 768)
-        l_feats = l_feats.permute(0, 2, 1)  # (B, 768, N_l) to make Conv1d happy
-        l_mask = l_mask.unsqueeze(dim=-1)  # (batch, N_l, 1)
+        if self.backbone_type == 'swin':
+            l_feats = self.text_encoder(text, attention_mask=l_mask)[0]  # (6, 10, 768)
+            l_feats = l_feats.permute(0, 2, 1)  # (B, 768, N_l) to make Conv1d happy
+            l_mask = l_mask.unsqueeze(dim=-1)  # (batch, N_l, 1)
+        else:
+            l = self.text_encoder.token_embedding(text)  # [batch_size, n_ctx, d_model]
+            l = l + self.text_encoder.positional_embedding[:l.size(1)]
+            l = l.permute(1, 0, 2)  # NLD -> LND
+            l = self.text_encoder.transformer(l, attn_mask=build_attention_mask(l.size(0)).to(l.device))
+            l = l.permute(1, 0, 2)  # LND -> NLD
+            l = self.text_encoder.ln_final(l)
+            l_feats = l
+            l_feats = l_feats.permute(0, 2, 1)  # (B, 768, N_l) to make Conv1d happy
+            l_mask = l_mask.unsqueeze(dim=-1)  # (batch, N_l, 1)
+            # text_embed = x[torch.arange(x.shape[0]), text.argmax(dim=-1)] @ self.text_encoder.text_projection
+
         ##########################
-        features = self.backbone(x, l_feats, l_mask)
-        x_c1, x_c2, x_c3, x_c4 = features
+        if self.backbone_type == 'ldm':
+            features = self.backbone(x)
+            x_c1, x_c2, x_c3, x_c4 = features['s2'], features['s3'], features['s4'], features['s5']
+        else:
+            features = self.backbone(x, l_feats, l_mask)
+            x_c1, x_c2, x_c3, x_c4 = features
         pred, maps = self.decoder([x_c4, x_c3, x_c2, x_c1], l_feats, l_mask)
         pred = F.interpolate(pred, input_shape, mode='bilinear', align_corners=True)
         # loss
@@ -82,3 +110,9 @@ class CGFormer(nn.Module):
             return pred.detach(), mask, loss
         else:
             return pred.detach(), maps
+    
+    def train(self, mode: bool = True):
+        super().train(mode)
+        if self.backbone_type == 'ldm':
+            self.backbone.feature_extractor.ldm_extractor.ldm.eval()
+        return self

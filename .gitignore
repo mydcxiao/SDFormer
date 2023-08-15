@@ -1,7 +1,6 @@
-/exp
-/wandb/**
-**/__pycache__
-/train_open.py
-/.vscode
-config/config.yaml
-config/open.yaml
+checkpoints/
+pretrained/
+logs/
+data/
+wandb/
+exp/

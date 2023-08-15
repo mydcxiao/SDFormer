@@ -12,6 +12,7 @@ import utils.config as config
 from engine.engine import inference
 from model import build_segmenter
 from utils.dataset import RefDataset
+from utils.dataset_ldm import RefDataset as RefDataset_ldm
 from utils.misc import setup_logger
 
 warnings.filterwarnings("ignore")
@@ -53,13 +54,23 @@ def main():
     logger.info(args.test_split)
 
     # build dataset & dataloader
-    test_data = RefDataset(lmdb_dir=args.test_lmdb,
-                           mask_dir=args.mask_root,
-                           dataset=args.dataset,
-                           split=args.test_split,
-                           mode='test',
-                           input_size=args.input_size,
-                           word_length=args.word_len)
+    if args.backbone == 'swin':
+        test_data = RefDataset(lmdb_dir=args.test_lmdb,
+                            mask_dir=args.mask_root,
+                            dataset=args.dataset,
+                            split=args.test_split,
+                            mode='test',
+                            input_size=args.input_size,
+                            word_length=args.word_len)
+    else:
+        test_data = RefDataset_ldm(lmdb_dir=args.test_lmdb,
+                                mask_dir=args.mask_root,
+                                dataset=args.dataset,
+                                split=args.test_split,
+                                mode='test',
+                                input_size=args.input_size,
+                                word_length=args.word_len)
+
     test_loader = torch.utils.data.DataLoader(test_data,
                                               batch_size=1,
                                               shuffle=False,

@@ -36,10 +36,14 @@ def train(train_loader, model, optimizer, scheduler, scaler, epoch, args):
     for i, (image, text, target, l_mask) in enumerate(train_loader):
         data_time.update(time.time() - end)
         # data
-        image = torch.stack(image).cuda(non_blocking=True)
-        text = torch.stack(text).cuda(non_blocking=True)
-        target = torch.stack(target).cuda(non_blocking=True)
-        l_mask = torch.stack(l_mask).cuda(non_blocking=True)
+        # image = torch.stack(image).cuda(non_blocking=True)
+        # text = torch.stack(text).cuda(non_blocking=True)
+        # target = torch.stack(target).cuda(non_blocking=True)
+        # l_mask = torch.stack(l_mask).cuda(non_blocking=True)
+        image = image.cuda(non_blocking=True)
+        text = text.cuda(non_blocking=True)
+        target = target.cuda(non_blocking=True)
+        l_mask = l_mask.cuda(non_blocking=True)
         # # multi-scale training
         # image = F.interpolate(image, size=(new_size, new_size), mode='bilinear', align_corners=True)
         text = text.squeeze(1)
@@ -96,9 +100,12 @@ def validate(val_loader, model, epoch, args):
     time.sleep(2)
     for imgs, text, masks, l_mask in val_loader:
         # data
-        imgs = torch.stack(imgs).cuda(non_blocking=True)
-        text = torch.stack(text).cuda(non_blocking=True)
-        l_mask = torch.stack(l_mask).cuda(non_blocking=True)
+        # imgs = torch.stack(imgs).cuda(non_blocking=True)
+        # text = torch.stack(text).cuda(non_blocking=True)
+        # l_mask = torch.stack(l_mask).cuda(non_blocking=True)
+        imgs = imgs.cuda(non_blocking=True)
+        text = text.cuda(non_blocking=True)
+        l_mask = l_mask.cuda(non_blocking=True)
         text = text.squeeze(1)
         l_mask = l_mask.squeeze(1)
         # inference

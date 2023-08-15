@@ -308,7 +308,8 @@ class Decoder(nn.Module):
         trunc_normal_(self.tokens.weight, std=0.02)
 
         dims = [1024, 512, 256, 128]
-        pe_shapes = [30, 60, 120]
+        # pe_shapes = [30, 60, 120]
+        pe_shapes = [32, 64, 128]
 
         self.layers = []
         for pe_shape in pe_shapes:

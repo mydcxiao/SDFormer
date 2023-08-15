@@ -1,16 +1,18 @@
 DATA:
   dataset: refcoco
   train_split: train
-  train_lmdb: path/refcoco/train.lmdb
+  train_lmdb: data/lmdb/refcoco/train.lmdb
   val_split: val
-  val_lmdb: path/val.lmdb
-  mask_root: path/masks/refcoco
+  val_lmdb: data/lmdb/refcoco/val.lmdb
+  mask_root: data/masks/refcoco
 TRAIN:
+  backbone: ldm
   swin_type: base
   swin_pretrain: path/swin_base_window12.pth
+  ldm_pretrain: pretrained/ldm_encoder/caption_backbone.pth
   bert: bert-base-uncased
   mha: '8-8-8-8'
-  input_size: 480
+  input_size: 512
   word_len: 20
   word_dim: 768
   vis_dim: 512
@@ -19,18 +21,18 @@ TRAIN:
   sync_bn: True
   dropout: 0.
   fusion_drop: 0.
-  workers: 32  # data loader workers
+  workers: 24  # data loader workers
   workers_val: 8
-  batch_size: 64  # batch size for training
-  batch_size_val: 16  # batch size for validation during training, memory and speed tradeoff
+  batch_size: 24  # batch size for training
+  batch_size_val: 18  # batch size for validation during training, memory and speed tradeoff
   start_epoch: 0
   epochs: 50
   lr_backbone: 5.e-5
   lr_text_encoder: 5.e-5
-  lr: 1.e-4
+  lr: 5.e-5
   weight_decay: 1.e-4
   amsgrad: True
-  manual_seed: 
+  manual_seed: 0
   print_freq: 100
   exp_name: cgformer
   output_folder: exp/refcoco/
@@ -40,6 +42,7 @@ TRAIN:
   evaluate: True 
 Distributed:
   dist_url: tcp://localhost:12345
+  # dist_url: 'env://'
   dist_backend: 'nccl'
   multiprocessing_distributed: True
   world_size: 1
@@ -47,5 +50,5 @@ Distributed:
 TEST:
   window12: True # if use window12 pretrained for training, testing set true
   test_split: val
-  test_lmdb: path/refcoco/val.lmdb
+  test_lmdb: data/lmdb/refcoco/val.lmdb
   visualize: False
