@@ -1,7 +1,5 @@
-# CGFormer
-The official PyTorch implementation of the CVPR 2023 paper "Contrastive Grouping with Transformer for Referring Image Segmentation".
-
-This paper first introduces learnable query tokens to represent objects and then alternately queries linguistic features and groups visual features into the query tokens for object-aware cross-modal reasoning. CGFormer achieves cross-level interaction by jointly updating the query tokens and decoding masks in every two consecutive layers. In addition, we introduce new splits on datasets for evaluating generalization for referring image segmentation models.
+# Diffusion Model As an encoder + CGFormer
+The official PyTorch implementation of diffusion model as an image encoder and CGFormer as an decoder, which is from the CVPR 2023 paper "Contrastive Grouping with Transformer for Referring Image Segmentation". The paper first introduces learnable query tokens to represent objects and then alternately queries linguistic features and groups visual features into the query tokens for object-aware cross-modal reasoning. CGFormer achieves cross-level interaction by jointly updating the query tokens and decoding masks in every two consecutive layers.
 
 ## Framework
 <p align="center">
@@ -11,7 +9,8 @@ This paper first introduces learnable query tokens to represent objects and then
 ## Preparation
 
 1. Environment
-   - [PyTorch](www.pytorch.org) 
+   - [PyTorch](www.pytorch.org)
+   - Stable Diffusion dependencies(https://github.com/CompVis/stable-diffusion)
    - Other dependencies in `requirements.txt`
 2. Datasets
    - The detailed instruction is in [prepare_datasets](data/READEME.md)
@@ -39,18 +38,5 @@ CUDA_VISIBLE_DEVICES=0 python -u test.py \
 
 This project is under the MIT license. See [LICENSE](LICENSE) for details.
 
-
-## Citation
-If you find our work useful in your research, please consider citing:
-```
-@InProceedings{Tang_2023_CVPR,
-    author    = {Tang, Jiajin and Zheng, Ge and Shi, Cheng and Yang, Sibei},
-    title     = {Contrastive Grouping With Transformer for Referring Image Segmentation},
-    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-    month     = {June},
-    year      = {2023},
-    pages     = {23570-23580}
-}
-```
 
 Some code changes come from [CRIS](https://github.com/DerrickWang005/CRIS.pytorch/tree/master) and [LAVT](https://github.com/yz93/LAVT-RIS).
