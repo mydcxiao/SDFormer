@@ -3,7 +3,7 @@ The official PyTorch implementation of diffusion model as an image encoder and C
 
 ## Framework
 <p align="center">
-  <img src="image/framework.jpg" width="1000">
+  <img src="image/framework.png" width="1000">
 </p>
 
 ## Preparation
