@@ -1,4 +1,4 @@
-# Diffusion Model As a Image Encoder + CGFormer
+# Diffusion Model As an Image Encoder + CGFormer
 The official PyTorch implementation of diffusion model as an image encoder and CGFormer as an decoder, which is from the CVPR 2023 paper "Contrastive Grouping with Transformer for Referring Image Segmentation". The paper first introduces learnable query tokens to represent objects and then alternately queries linguistic features and groups visual features into the query tokens for object-aware cross-modal reasoning. CGFormer achieves cross-level interaction by jointly updating the query tokens and decoding masks in every two consecutive layers.
 
 ## Framework
