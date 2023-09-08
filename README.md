@@ -39,4 +39,4 @@ CUDA_VISIBLE_DEVICES=0 python -u test.py \
 This project is under the MIT license. See [LICENSE](LICENSE) for details.
 
 
-Some code changes come from [CRIS](https://github.com/DerrickWang005/CRIS.pytorch/tree/master) and [LAVT](https://github.com/yz93/LAVT-RIS).
+Some code changes come from [CRIS](https://github.com/DerrickWang005/CRIS.pytorch/tree/master), [CGFormer](https://github.com/Toneyaya/CGFormer), [ODISE](https://github.com/NVlabs/ODISE/tree/main) and [LAVT](https://github.com/yz93/LAVT-RIS).
