@@ -34,6 +34,14 @@ CUDA_VISIBLE_DEVICES=0 python -u test.py \
       --opts TEST.test_split val \
              TEST.test_lmdb path/val.lmdb
 ```
+## Results
+
+|     Dataset     | P@0.5 | P@0.6 | P@0.7 | P@0.8 | P@0.9 | Overall IoU | Mean IoU |
+|:---------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----------:|:--------:|
+| RefCOCO val     | 72.12 | 66.31 | 59.29 | 49.05 | 24.53 |    63.41    |   64.65  |
+| RefCOCO test A  | 83.03 | 78.20 | 71.68 | 58.60 | 22.38 |    68.61    |   73.35  |
+| RefCOCO test B  | 73.68 | 67.11 | 60.22 | 49.44 | 26.79 |    59.96    |   67.79  |
+
 ## License
 
 This project is under the MIT license. See [LICENSE](LICENSE) for details.
