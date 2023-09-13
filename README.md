@@ -21,7 +21,7 @@ The official PyTorch implementation of diffusion model as an image encoder and C
 
 This implementation only supports **multi-gpu**, **DistributedDataParallel** training, which is faster and simpler; single-gpu or DataParallel training is not supported. Besides, the evaluation only supports single-gpu mode.
 
-To do training of CGFormer with 8 GPUs, run:
+To do training of CGFormer with multiple GPUs, run:
 
 ```
 python -u train.py --config config/config.yaml
@@ -30,9 +30,9 @@ python -u train.py --config config/config.yaml
 To do evaluation of CGFormer with 1 GPU, run:
 ```
 CUDA_VISIBLE_DEVICES=0 python -u test.py \
-      --config config/refcoco/config.yaml \
+      --config config/config.yaml \
       --opts TEST.test_split val \
-             TEST.test_lmdb path/val.lmdb
+             TEST.test_lmdb data/refcoco/val.lmdb
 ```
 ## Results
 
@@ -40,7 +40,7 @@ CUDA_VISIBLE_DEVICES=0 python -u test.py \
 |:---------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----------:|:--------:|
 | RefCOCO val     | 72.12 | 66.31 | 59.29 | 49.05 | 24.53 |    63.41    |   64.65  |
 | RefCOCO test A  | 75.75 | 70.81 | 64.35 | 52.82 | 26.62 |    66.14    |   67.39  |
-| RefCOCO test B  | 73.68 | 67.11 | 60.22 | 49.44 | 26.79 |    59.96    |   67.79  |
+| RefCOCO test B  | 67.81 | 61.96 | 54.64 | 43.38 | 22.81 |    60.74    |   61.66  |
 
 ## License
 
