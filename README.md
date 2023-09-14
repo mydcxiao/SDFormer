@@ -16,6 +16,7 @@ The official PyTorch implementation of diffusion model as an image encoder and C
    - The detailed instruction is in [prepare_datasets](data/READEME.md)
 3. Pretrained weights
    - [Swin-Base-window12](https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_base_patch4_window12_384_22k.pth)
+   - Diffusion Encoder of ODISE, refer to [ODISE](https://github.com/NVlabs/ODISE/tree/main)
 
 ## Train and Test (RIS)
 
