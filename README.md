@@ -10,7 +10,7 @@ The official PyTorch implementation of diffusion model as an image encoder and C
 
 1. Environment
    - [PyTorch](www.pytorch.org)
-   - Stable Diffusion dependencies(https://github.com/CompVis/stable-diffusion)
+   - [Stable Diffusion dependencies](https://github.com/CompVis/stable-diffusion)
    - Other dependencies in `requirements.txt`
 2. Datasets
    - The detailed instruction is in [prepare_datasets](data/READEME.md)
